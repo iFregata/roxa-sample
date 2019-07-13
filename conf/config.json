@@ -1,0 +1,6 @@
+{
+	"name": "Sample Server",
+	"http_endpoint": "sample-server",
+	"port": 8181,
+	"context_path": "/tutor"
+}
