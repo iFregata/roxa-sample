@@ -40,7 +40,7 @@
 			<AppenderRef ref="generalLogFile" />
 			<AppenderRef ref="console" />
 		</Logger>
-		<Root level="${env:APP_LOG_LEVEL:-info}">
+		<Root level="debug">
 			<AppenderRef ref="generalLogFile" />
 			<AppenderRef ref="console" />
 		</Root>

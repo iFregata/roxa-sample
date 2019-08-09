@@ -1,0 +1,15 @@
+{
+  "data_sources":[
+    {
+      "vendor":"mysql",
+      "data_source_name":"dsname",
+      "user":"root",
+      "pass":"pass",
+      "host":"localhost",
+      "port":3306,
+      "database":"dbname",
+      "pool_size":5,
+      "leak_trace_interval":-1
+    }
+  ]
+}

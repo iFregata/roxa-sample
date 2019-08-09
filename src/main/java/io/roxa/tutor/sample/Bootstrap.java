@@ -17,6 +17,7 @@ import io.reactivex.Completable;
 import io.roxa.vertx.rx.AbstractBootVerticle;
 import io.vertx.config.ConfigChange;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.CompletableHelper;
 
@@ -30,7 +31,12 @@ public class Bootstrap extends AbstractBootVerticle {
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
-		configuration().flatMapCompletable(this::deploy).subscribe(CompletableHelper.toObserver(startFuture));
+
+	}
+
+	@Override
+	public void start(Promise<Void> startPromise) throws Exception {
+		configuration().flatMapCompletable(this::deploy).subscribe(CompletableHelper.toObserver(startPromise.future()));
 	}
 
 	protected void configurationChanged(ConfigChange change) {
@@ -44,6 +50,6 @@ public class Bootstrap extends AbstractBootVerticle {
 	}
 
 	private Completable deploy(JsonObject conf) {
-		return redeploy(new SampleServer(conf));
+		return redeploy(new AppServer(conf));
 	}
 }

@@ -17,9 +17,9 @@ import io.vertx.core.json.JsonObject;
  * @author Steven Chen
  *
  */
-public class SampleServer extends AbstractHttpVerticle {
+public class AppServer extends AbstractHttpVerticle {
 
-	public SampleServer(JsonObject conf) {
+	public AppServer(JsonObject conf) {
 		super(conf);
 	}
 
@@ -27,5 +27,4 @@ public class SampleServer extends AbstractHttpVerticle {
 	protected String getServerName() {
 		return "Sample Server";
 	}
-
 }
