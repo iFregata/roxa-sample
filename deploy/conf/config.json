@@ -2,5 +2,8 @@
 	"name": "Sample Server",
 	"http_endpoint": "sample-server",
 	"port": 8181,
-	"context_path": "/tutor"
+	"context_path": "/tutor",
+	"redis_conf":[
+		{"host":"redis_std","port":6379}
+	]
 }

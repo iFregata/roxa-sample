@@ -1,4 +1,4 @@
-# tag: roxa/parkletx:latest
+# tag: roxa/roxa-sample:latest
 FROM roxa/java:8u212
 LABEL maintainer="steven@abacus.com.cn"
 
@@ -9,7 +9,7 @@ ENV ARTIFACT_HOME /opt/vertxapp
 ENV ARTIFACT_CFG_LOCATION $ARTIFACT_HOME/conf
 ENV ARTIFACT_FILE $ARTIFACT_ID-$ARTIFACT_VERSION-fat.jar
 
-EXPOSE 8787
+EXPOSE 8181
 
 COPY target/$ARTIFACT_FILE $ARTIFACT_HOME/
 COPY deploy/conf $ARTIFACT_CFG_LOCATION/

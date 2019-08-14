@@ -13,3 +13,13 @@ run <full-class-name-of-boot-verticle> --redeploy=**/*.java --launcher-class=io.
 The Env: `APP_LOG_LEVEL=debug`
 
 # 部署说明
+
+### Docker Service
+
+```
+docker service create \
+--name roxa-sample \
+--network my_attachable_net \
+--publish published=8181,target=8181 \
+roxa/roxa-sample:latest
+```
