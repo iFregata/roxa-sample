@@ -28,11 +28,7 @@ public class AppServer extends AbstractHttpVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(AppServer.class);
 
-	private RedisExecutor redis;
-
-	private DataAccess1 da1;
-
-	private DataAccess2 da2;
+	private StoreRepository storeRepository;
 
 	public AppServer(JsonObject conf) {
 		super(conf);
@@ -45,80 +41,61 @@ public class AppServer extends AbstractHttpVerticle {
 
 	@Override
 	protected Completable setupResources() {
-		this.redis = RedisExecutor.create(vertx, getServerConfiguration());
-		da1 = new DataAccess1();
-		da2 = new DataAccess2();
+		storeRepository = StoreRepository.create();
 		return super.setupResources();
 	}
 
 	@Override
 	protected Single<Router> setupRouter(Router router) {
-		router.post(pathOf("/redis/json")).handler(this::postJson);
-		router.post(pathOf("/redis/kv")).handler(this::postKv);
-		router.get(pathOf("/jdbc")).handler(this::pingJdbc);
-		router.get(pathOf("/redis/json/:key")).handler(this::getJson);
-		router.get(pathOf("/redis/kv")).handler(this::getKv);
+		router.get(pathOf("/products/:productId")).produces(MEDIA_TYPE_APPLICATION_JSON)
+				.handler(this::findProductHandler);
+		router.get(pathOf("/products")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::listProductHandler);
+
+		router.delete(pathOf("/products/:productId")).produces(MEDIA_TYPE_APPLICATION_JSON)
+				.handler(this::removeProductHandler);
+
+		router.post(pathOf("/products")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::saveProductHandler);
+
 		return super.setupRouter(router);
 	}
 
-	private void pingJdbc(RoutingContext rc) {
-		da2.queryNum().subscribe(rs -> {
-			logger.info("Query num: {}", rs.encode());
-		}, e -> {
-			logger.error("dd", e);
-			failed(rc, e);
-		});
-		da1.queryData().subscribe(rs -> {
+	private void saveProductHandler(RoutingContext rc) {
+		logger.debug("Handle the save product request.");
+		JsonObject productInfo = rc.getBodyAsJson();
+		storeRepository.saveProduct(productInfo).subscribe(rs -> {
 			succeeded(rc, rs);
 		}, e -> {
-			logger.error("dd", e);
 			failed(rc, e);
 		});
-
 	}
 
-	private void postJson(RoutingContext rc) {
-		JsonObject body = rc.getBodyAsJson();
-		String key = requestParam(rc, "key");
-		redis.put(key, body).subscribe(() -> {
+	private void listProductHandler(RoutingContext rc) {
+		logger.debug("Handle the list product request.");
+		storeRepository.listProducts().subscribe(list -> {
+			succeeded(rc, list);
+		}, e -> {
+			failed(rc, e);
+		});
+	}
+
+	private void findProductHandler(RoutingContext rc) {
+		logger.debug("Handle the find product request.");
+		String productId = requestParam(rc, "productId");
+		storeRepository.findProduct(productId).subscribe(rs -> {
+			succeeded(rc, rs);
+		}, e -> {
+			failed(rc, e);
+		});
+	}
+
+	private void removeProductHandler(RoutingContext rc) {
+		logger.debug("Handle the remove product request.");
+		String productId = requestParam(rc, "productId");
+		storeRepository.removeProduct(productId).subscribe(() -> {
 			succeeded(rc);
 		}, e -> {
 			failed(rc, e);
 		});
-
-	}
-
-	private void getJson(RoutingContext rc) {
-		String key = requestParam(rc, "key");
-		redis.getJsonObject(key).subscribe((s) -> {
-			logger.debug("String resp: {}", s);
-			succeeded(rc, s);
-		}, e -> {
-			failed(rc, e);
-		});
-
-	}
-
-	private void postKv(RoutingContext rc) {
-		JsonObject body = rc.getBodyAsJson();
-		String key = body.getString("key");
-		String value = body.getString("value");
-		redis.set(key, value).subscribe(() -> {
-			succeeded(rc);
-		}, e -> {
-			failed(rc, e);
-		});
-
-	}
-
-	private void getKv(RoutingContext rc) {
-		String key = requestParam(rc, "key");
-		redis.get(key).subscribe(v -> {
-			succeeded(rc, new JsonObject().put("key", key).put("value", v));
-		}, e -> {
-			failed(rc, e);
-		});
-
 	}
 
 }

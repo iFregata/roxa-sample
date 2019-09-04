@@ -35,7 +35,7 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger name="io.roxa" level="${env:APP_LOG_LEVEL:-info}" additivity="false">
+		<Logger name="io.roxa" level="debug" additivity="false">
 			<AppenderRef ref="errorLogFile" />
 			<AppenderRef ref="generalLogFile" />
 			<AppenderRef ref="console" />
