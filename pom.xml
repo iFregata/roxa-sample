@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.roxa</groupId>
 		<artifactId>roxa</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
+		<version>4.0.0</version>
 	</parent>
 	<groupId>io.roxa.tutor</groupId>
 	<artifactId>roxa-sample</artifactId>
@@ -13,12 +13,12 @@
 
 	<scm>
 		<connection>scm:git:https://git.shellpays.com/roxa/roxa-sample.git</connection>
-		<developerConnection>scm:git:[fetch=]https://git.shellpays.com/parklet/roxa-sample.git[push=]https://git.shellpays.com/parklet/roxa-sample.git</developerConnection>
-		<url>https://git.shellpays.com/parklet/roxa-sample.git</url>
+		<developerConnection>scm:git:[fetch=]https://git.shellpays.com/roxa/roxa-sample.git[push=]https://git.shellpays.com/roxa/roxa-sample.git</developerConnection>
+		<url>https://git.shellpays.com/roxa/roxa-sample.git</url>
 	</scm>
 
 	<properties>
-		<vertx.version>3.8.1</vertx.version>
+		<vertx.version>3.8.2</vertx.version>
 		<roxa-base.version>1.2.0-SNAPSHOT</roxa-base.version>
 		<main.verticle>io.roxa.tutor.sample.Bootstrap</main.verticle>
 	</properties>
