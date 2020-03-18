@@ -1,0 +1,1 @@
+docker logs --tail 200 roxa-sample
