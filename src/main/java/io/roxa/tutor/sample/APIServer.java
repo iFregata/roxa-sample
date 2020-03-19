@@ -13,9 +13,10 @@ package io.roxa.tutor.sample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.roxa.vertx.rx.EventActionDispatcherHelper;
 import io.roxa.vertx.rx.http.AbstractHttpVerticle;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
@@ -24,25 +25,17 @@ import io.vertx.reactivex.ext.web.RoutingContext;
  * @author Steven Chen
  *
  */
-public class AppServer extends AbstractHttpVerticle {
+public class APIServer extends AbstractHttpVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(APIServer.class);
 
-	private StoreRepository storeRepository;
-
-	public AppServer(JsonObject conf) {
+	public APIServer(JsonObject conf) {
 		super(conf);
 	}
 
 	@Override
 	protected String getServerName() {
-		return "Sample Server";
-	}
-
-	@Override
-	protected Completable setupResources() {
-		storeRepository = StoreRepository.create();
-		return super.setupResources();
+		return "Sample API Server";
 	}
 
 	@Override
@@ -50,52 +43,54 @@ public class AppServer extends AbstractHttpVerticle {
 		router.get(pathOf("/products/:productId")).produces(MEDIA_TYPE_APPLICATION_JSON)
 				.handler(this::findProductHandler);
 		router.get(pathOf("/products")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::listProductHandler);
-
 		router.delete(pathOf("/products/:productId")).produces(MEDIA_TYPE_APPLICATION_JSON)
 				.handler(this::removeProductHandler);
-
 		router.post(pathOf("/products")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::saveProductHandler);
-
 		return super.setupRouter(router);
 	}
 
 	private void saveProductHandler(RoutingContext rc) {
 		logger.debug("Handle the save product request.");
 		JsonObject productInfo = rc.getBodyAsJson();
-		storeRepository.saveProduct(productInfo).subscribe(rs -> {
-			succeeded(rc, rs);
-		}, e -> {
-			failed(rc, e);
-		});
+		EventActionDispatcherHelper
+				.<JsonObject>request(vertx, "io.roxa.tutor.sample.StoreFacade#saveProduct", productInfo.copy())
+				.subscribe(rs -> {
+					succeeded(rc, rs.body());
+				}, e -> {
+					failed(rc, e);
+				});
 	}
 
 	private void listProductHandler(RoutingContext rc) {
 		logger.debug("Handle the list product request.");
-		storeRepository.listProducts().subscribe(list -> {
-			succeeded(rc, list);
-		}, e -> {
-			failed(rc, e);
-		});
+		EventActionDispatcherHelper.<JsonArray>request(vertx, "io.roxa.tutor.sample.StoreFacade#listProducts")
+				.subscribe(rs -> {
+					succeeded(rc, rs.body());
+				}, e -> {
+					failed(rc, e);
+				});
 	}
 
 	private void findProductHandler(RoutingContext rc) {
 		logger.debug("Handle the find product request.");
 		String productId = requestParam(rc, "productId");
-		storeRepository.findProduct(productId).subscribe(rs -> {
-			succeeded(rc, rs);
-		}, e -> {
-			failed(rc, e);
-		});
+		EventActionDispatcherHelper.<JsonObject>request(vertx, "io.roxa.tutor.sample.StoreFacade#findProduct",
+				new JsonObject().put("productId", productId)).subscribe(rs -> {
+					succeeded(rc, rs.body());
+				}, e -> {
+					failed(rc, e);
+				});
 	}
 
 	private void removeProductHandler(RoutingContext rc) {
 		logger.debug("Handle the remove product request.");
 		String productId = requestParam(rc, "productId");
-		storeRepository.removeProduct(productId).subscribe(() -> {
-			succeeded(rc);
-		}, e -> {
-			failed(rc, e);
-		});
+		EventActionDispatcherHelper.<JsonObject>request(vertx, "io.roxa.tutor.sample.StoreFacade#removeProduct",
+				new JsonObject().put("productId", productId)).subscribe(rs -> {
+					succeeded(rc, rs.body());
+				}, e -> {
+					failed(rc, e);
+				});
 	}
 
 }

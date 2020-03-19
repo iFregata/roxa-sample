@@ -1,3 +1,8 @@
+# 2020-03-19
+
+. Upgrade the Vert.x to 3.8.5
+. Added the EventActionDispatcher to degress the event bus invokation
+
 # 2019-09-04 Added the MySQL service deployment
 
 # 2019-08-31 Upgrade the Vert.x to 3.8.1

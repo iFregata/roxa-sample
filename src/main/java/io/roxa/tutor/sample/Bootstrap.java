@@ -11,6 +11,7 @@
 package io.roxa.tutor.sample;
 
 import io.reactivex.Completable;
+import io.roxa.vertx.Runner;
 import io.roxa.vertx.rx.AbstractBootVerticle;
 import io.vertx.core.json.JsonObject;
 
@@ -20,11 +21,15 @@ import io.vertx.core.json.JsonObject;
  */
 public class Bootstrap extends AbstractBootVerticle {
 
+	public static void main(String[] args) {
+		Runner.run(Bootstrap.class.getName());
+	}
+
 	public void start() throws Exception {
 		setupJdbcManager();
 	}
 
 	protected Completable deploy(JsonObject conf) {
-		return redeploy(new AppServer(conf));
+		return redeploy(new StoreFacade("mystore")).andThen(redeploy(new APIServer(conf)));
 	}
 }
