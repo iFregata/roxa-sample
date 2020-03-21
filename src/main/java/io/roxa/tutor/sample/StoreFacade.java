@@ -21,8 +21,8 @@ import io.vertx.core.json.JsonObject;
  */
 public class StoreFacade extends EventActionDispatcher {
 
-	public StoreFacade(String dataSourceName) {
-		super(StoreFacade.class.getName(), dataSourceName);
+	public StoreFacade(String urn, String dataSourceName) {
+		super(urn, dataSourceName);
 	}
 
 	public Single<JsonObject> saveProduct(JsonObject productInfo) {

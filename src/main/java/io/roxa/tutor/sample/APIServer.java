@@ -29,8 +29,11 @@ public class APIServer extends AbstractHttpVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(APIServer.class);
 
-	public APIServer(JsonObject conf) {
+	private String storeFacadeURN;
+
+	public APIServer(JsonObject conf, String storeFacadeURN) {
 		super(conf);
+		this.storeFacadeURN = storeFacadeURN;
 	}
 
 	@Override
@@ -52,10 +55,9 @@ public class APIServer extends AbstractHttpVerticle {
 	private void saveProductHandler(RoutingContext rc) {
 		logger.debug("Handle the save product request.");
 		JsonObject productInfo = rc.getBodyAsJson();
-		EventActionDispatcherHelper
-				.<JsonObject>request(vertx, "io.roxa.tutor.sample.StoreFacade#saveProduct", productInfo.copy())
+		EventActionDispatcherHelper.<JsonObject>request(vertx, storeFacadeURN, "saveProduct", productInfo.copy())
 				.subscribe(rs -> {
-					succeeded(rc, rs.body());
+					succeeded(rc, rs);
 				}, e -> {
 					failed(rc, e);
 				});
@@ -63,20 +65,20 @@ public class APIServer extends AbstractHttpVerticle {
 
 	private void listProductHandler(RoutingContext rc) {
 		logger.debug("Handle the list product request.");
-		EventActionDispatcherHelper.<JsonArray>request(vertx, "io.roxa.tutor.sample.StoreFacade#listProducts")
-				.subscribe(rs -> {
-					succeeded(rc, rs.body());
-				}, e -> {
-					failed(rc, e);
-				});
+		EventActionDispatcherHelper.<JsonArray>request(vertx, storeFacadeURN, "listProducts").subscribe(rs -> {
+			succeeded(rc, rs);
+		}, e -> {
+			failed(rc, e);
+		});
 	}
 
 	private void findProductHandler(RoutingContext rc) {
 		logger.debug("Handle the find product request.");
 		String productId = requestParam(rc, "productId");
-		EventActionDispatcherHelper.<JsonObject>request(vertx, "io.roxa.tutor.sample.StoreFacade#findProduct",
-				new JsonObject().put("productId", productId)).subscribe(rs -> {
-					succeeded(rc, rs.body());
+		EventActionDispatcherHelper
+				.<JsonObject>request(vertx, storeFacadeURN, "findProduct", new JsonObject().put("productId", productId))
+				.subscribe(rs -> {
+					succeeded(rc, rs);
 				}, e -> {
 					failed(rc, e);
 				});
@@ -85,9 +87,9 @@ public class APIServer extends AbstractHttpVerticle {
 	private void removeProductHandler(RoutingContext rc) {
 		logger.debug("Handle the remove product request.");
 		String productId = requestParam(rc, "productId");
-		EventActionDispatcherHelper.<JsonObject>request(vertx, "io.roxa.tutor.sample.StoreFacade#removeProduct",
+		EventActionDispatcherHelper.<JsonObject>request(vertx, storeFacadeURN, "removeProduct",
 				new JsonObject().put("productId", productId)).subscribe(rs -> {
-					succeeded(rc, rs.body());
+					succeeded(rc, rs);
 				}, e -> {
 					failed(rc, e);
 				});

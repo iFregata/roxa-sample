@@ -20,6 +20,7 @@ import io.vertx.core.json.JsonObject;
  *
  */
 public class Bootstrap extends AbstractBootVerticle {
+	private static final String storeFacadeURU = StoreFacade.class.getName();
 
 	public static void main(String[] args) {
 		Runner.run(Bootstrap.class.getName());
@@ -30,6 +31,8 @@ public class Bootstrap extends AbstractBootVerticle {
 	}
 
 	protected Completable deploy(JsonObject conf) {
-		return redeploy(new StoreFacade("mystore")).andThen(redeploy(new APIServer(conf)));
+
+		return redeploy(new StoreFacade(storeFacadeURU, "mystore"))
+				.andThen(redeploy(new APIServer(conf, storeFacadeURU)));
 	}
 }
