@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.reactivex.Single;
-import io.roxa.vertx.rx.EventActionDispatcherHelper;
+import io.roxa.vertx.rx.EventActionEndpoint;
 import io.roxa.vertx.rx.http.AbstractHttpVerticle;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -55,8 +55,8 @@ public class APIServer extends AbstractHttpVerticle {
 	private void saveProductHandler(RoutingContext rc) {
 		logger.debug("Handle the save product request.");
 		JsonObject productInfo = rc.getBodyAsJson();
-		EventActionDispatcherHelper.<JsonObject>request(vertx, storeFacadeURN, "saveProduct", productInfo.copy())
-				.subscribe(rs -> {
+		EventActionEndpoint.create(vertx).urn(storeFacadeURN).action("saveProduct")
+				.<JsonObject>request(productInfo.copy()).subscribe(rs -> {
 					succeeded(rc, rs);
 				}, e -> {
 					failed(rc, e);
@@ -65,19 +65,19 @@ public class APIServer extends AbstractHttpVerticle {
 
 	private void listProductHandler(RoutingContext rc) {
 		logger.debug("Handle the list product request.");
-		EventActionDispatcherHelper.<JsonArray>request(vertx, storeFacadeURN, "listProducts").subscribe(rs -> {
-			succeeded(rc, rs);
-		}, e -> {
-			failed(rc, e);
-		});
+		EventActionEndpoint.create(vertx).urn(storeFacadeURN).action("listProducts").<JsonArray>request()
+				.subscribe(rs -> {
+					succeeded(rc, rs);
+				}, e -> {
+					failed(rc, e);
+				});
 	}
 
 	private void findProductHandler(RoutingContext rc) {
 		logger.debug("Handle the find product request.");
 		String productId = requestParam(rc, "productId");
-		EventActionDispatcherHelper
-				.<JsonObject>request(vertx, storeFacadeURN, "findProduct", new JsonObject().put("productId", productId))
-				.subscribe(rs -> {
+		EventActionEndpoint.create(vertx).urn(storeFacadeURN).action("findProduct")
+				.<JsonObject>request(new JsonObject().put("productId", productId)).subscribe(rs -> {
 					succeeded(rc, rs);
 				}, e -> {
 					failed(rc, e);
@@ -87,8 +87,8 @@ public class APIServer extends AbstractHttpVerticle {
 	private void removeProductHandler(RoutingContext rc) {
 		logger.debug("Handle the remove product request.");
 		String productId = requestParam(rc, "productId");
-		EventActionDispatcherHelper.<JsonObject>request(vertx, storeFacadeURN, "removeProduct",
-				new JsonObject().put("productId", productId)).subscribe(rs -> {
+		EventActionEndpoint.create(vertx).urn(storeFacadeURN).action("removeProduct")
+				.<JsonObject>request(new JsonObject().put("productId", productId)).subscribe(rs -> {
 					succeeded(rc, rs);
 				}, e -> {
 					failed(rc, e);
