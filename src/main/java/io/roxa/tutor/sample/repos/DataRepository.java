@@ -8,10 +8,10 @@
  *       http://mit-license.org/
  *       
  */
-package io.roxa.tutor.sample;
+package io.roxa.tutor.sample.repos;
 
 import io.reactivex.Single;
-import io.roxa.vertx.rx.EventActionDispatcher;
+import io.roxa.vertx.rx.jdbc.JdbcExecutor;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -19,13 +19,15 @@ import io.vertx.core.json.JsonObject;
  * @author Steven Chen
  *
  */
-public class StoreFacade extends EventActionDispatcher {
+public class DataRepository {
 
-	public StoreFacade(String urn, String dataSourceName) {
-		super(urn, dataSourceName);
+	private JdbcExecutor jdbc;
+
+	public DataRepository(JdbcExecutor jdbc) {
+		this.jdbc = jdbc;
 	}
 
-	public Single<JsonObject> saveProduct(JsonObject productInfo) {
+	public Single<Integer> insertProduct(JsonObject productInfo) {
 		long nowTimeMillis = System.currentTimeMillis();
 		String productId = productInfo.getString("id");
 		return jdbc.update(
@@ -34,28 +36,23 @@ public class StoreFacade extends EventActionDispatcher {
 				new JsonArray().add(productId).add(productInfo.getString("name")).add(productInfo.getInteger("price"))
 						.add(productInfo.getString("description")).add(nowTimeMillis).add(nowTimeMillis)
 						.add(nowTimeMillis))
-				.flatMap(affected -> {
-					return jdbc.queryFirstRow(
-							"select id, name, price, description, date_created, date_modified from product where id=?",
-							new JsonArray().add(productId));
-				});
+				.map(affect -> 0);
 	}
 
-	public Single<JsonObject> findProduct(JsonObject params) {
-		String productId = params.getString("productId");
+	public Single<JsonObject> selectProductBy(String productId) {
 		return jdbc.queryFirstRow(
 				"select id, name, price, description, date_created, date_modified from product where id=?",
 				new JsonArray().add(productId));
 	}
 
-	public Single<JsonArray> listProducts() {
+	public Single<JsonArray> selectProducts() {
 		return jdbc.queryRows("select id, name, price, description, date_created, date_modified from product", null)
 				.map(rows -> new JsonArray(rows));
 	}
 
-	public Single<JsonObject> removeProduct(JsonObject params) {
-		String productId = params.getString("productId");
+	public Single<JsonObject> deleteProduct(String productId) {
 		return jdbc.update("delete from product where id=?", new JsonArray().add(productId))
 				.map(affected -> new JsonObject().put("product_id", productId));
 	}
+
 }

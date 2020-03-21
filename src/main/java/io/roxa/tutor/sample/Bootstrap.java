@@ -11,6 +11,7 @@
 package io.roxa.tutor.sample;
 
 import io.reactivex.Completable;
+import io.roxa.tutor.sample.bloc.StoreFacade;
 import io.roxa.vertx.Runner;
 import io.roxa.vertx.rx.AbstractBootVerticle;
 import io.vertx.core.json.JsonObject;
