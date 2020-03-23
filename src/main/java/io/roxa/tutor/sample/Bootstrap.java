@@ -28,11 +28,11 @@ public class Bootstrap extends AbstractBootVerticle {
 	}
 
 	public void start() throws Exception {
+		setupCronScheduler();
 		setupJdbcManager();
 	}
 
 	protected Completable deploy(JsonObject conf) {
-
 		return redeploy(new StoreFacade(storeFacadeURU, "mystore"))
 				.andThen(redeploy(new APIServer(conf, storeFacadeURU)));
 	}

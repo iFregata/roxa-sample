@@ -13,8 +13,10 @@ package io.roxa.tutor.sample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.roxa.vertx.rx.EventActionEndpoint;
+import io.roxa.vertx.rx.cron.CronScheduler;
 import io.roxa.vertx.rx.http.AbstractHttpVerticle;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -39,6 +41,19 @@ public class APIServer extends AbstractHttpVerticle {
 	@Override
 	protected String getServerName() {
 		return "Sample API Server";
+	}
+
+	@Override
+	protected Completable setupResources() {
+		final String cronExpr = "0 0/1 * 1/1 * ? *";
+		CronScheduler.schedule(vertx, "io.roxa.sample.CronScheduler.test", cronExpr).subscribe(next -> {
+			logger.info("Test the scheduler with cronExpr: {}", cronExpr);
+		}, e -> {
+			logger.error("Test the scheduler failed");
+		}, () -> {
+			logger.info("Test the scheduler completed");
+		});
+		return super.setupResources();
 	}
 
 	@Override
