@@ -33,6 +33,10 @@ public class StoreFacade extends EventActionDispatcher {
 		dataRepository = new DataRepository(jdbc);
 	}
 
+	public Single<JsonObject> doSomeScheduledJob() {
+		return Single.just(new JsonObject().put("job_status", "done"));
+	}
+
 	public Single<JsonObject> saveProduct(JsonObject productInfo) {
 		String productId = productInfo.getString("productId");
 		return dataRepository.insertProduct(productInfo).flatMap(i -> dataRepository.selectProductBy(productId));

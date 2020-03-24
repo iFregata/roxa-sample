@@ -11,6 +11,7 @@
 package io.roxa.tutor.sample;
 
 import io.reactivex.Completable;
+import io.roxa.tutor.sample.bloc.JobScheduler;
 import io.roxa.tutor.sample.bloc.StoreFacade;
 import io.roxa.vertx.Runner;
 import io.roxa.vertx.rx.AbstractBootVerticle;
@@ -34,6 +35,7 @@ public class Bootstrap extends AbstractBootVerticle {
 
 	protected Completable deploy(JsonObject conf) {
 		return redeploy(new StoreFacade(storeFacadeURU, "mystore"))
-				.andThen(redeploy(new APIServer(conf, storeFacadeURU)));
+				.andThen(redeploy(new APIServer(conf, storeFacadeURU)))
+				.andThen(redeploy(new JobScheduler(storeFacadeURU)));
 	}
 }
