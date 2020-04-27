@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-ARTIFACT_ID=parkletx
+ARTIFACT_ID=roxa-sample
 
 echo "Prepare to update $ARTIFACT_ID docker image"
 docker pull registry.cn-hangzhou.aliyuncs.com/roxa/$ARTIFACT_ID:latest

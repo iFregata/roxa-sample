@@ -11,7 +11,7 @@
 package io.roxa.tutor.sample.repos;
 
 import io.reactivex.Single;
-import io.roxa.vertx.rx.jdbc.JdbcExecutor;
+import io.roxa.vertx.rx.jdbc.JdbcAgent;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -21,13 +21,13 @@ import io.vertx.core.json.JsonObject;
  */
 public class DataRepository {
 
-	private JdbcExecutor jdbc;
+	private JdbcAgent jdbc;
 
-	public DataRepository(JdbcExecutor jdbc) {
+	public DataRepository(JdbcAgent jdbc) {
 		this.jdbc = jdbc;
 	}
 
-	public Single<Integer> insertProduct(JsonObject productInfo) {
+	public Single<Integer> upsertProduct(JsonObject productInfo) {
 		long nowTimeMillis = System.currentTimeMillis();
 		String productId = productInfo.getString("id");
 		return jdbc.update(

@@ -95,6 +95,21 @@ registry.cn-hangzhou.aliyuncs.com/roxa/roxa-sample:latest
 
 == RESTful API
 
+
+Auth
+
+[source, json]
+----
+{
+  "client_id":"",
+  "verb":"GET|POST|PUT|...",
+  "roles":[],
+  "digest":""
+  "timestamp":"",
+  "nonce":""
+} 
+----
+
 Create Product
 
 ----

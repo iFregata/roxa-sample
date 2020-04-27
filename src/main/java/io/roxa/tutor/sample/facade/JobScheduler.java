@@ -8,7 +8,7 @@
  *       http://mit-license.org/
  *       
  */
-package io.roxa.tutor.sample.bloc;
+package io.roxa.tutor.sample.facade;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

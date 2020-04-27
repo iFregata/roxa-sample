@@ -10,11 +10,15 @@
  */
 package io.roxa.tutor.sample;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.reactivex.Completable;
-import io.roxa.tutor.sample.bloc.JobScheduler;
-import io.roxa.tutor.sample.bloc.StoreFacade;
+import io.roxa.tutor.sample.facade.StoreFacade;
 import io.roxa.vertx.Runner;
 import io.roxa.vertx.rx.AbstractBootVerticle;
+import io.roxa.vertx.rx.cassandra.CassandraDeployer;
+import io.roxa.vertx.rx.nitrite.NitriteDeployer;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -22,6 +26,9 @@ import io.vertx.core.json.JsonObject;
  *
  */
 public class Bootstrap extends AbstractBootVerticle {
+
+	private static final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
+
 	private static final String storeFacadeURU = StoreFacade.class.getName();
 
 	public static void main(String[] args) {
@@ -29,13 +36,31 @@ public class Bootstrap extends AbstractBootVerticle {
 	}
 
 	public void start() throws Exception {
-		setupCronScheduler();
-		setupJdbcManager();
+		// setupCronScheduler();
+		setupCassandraManager();
+		setupNitriteManager();
+		setupJdbcDeployer("mystore");
 	}
 
-	protected Completable deploy(JsonObject conf) {
-		return redeploy(new StoreFacade(storeFacadeURU, "mystore"))
-				.andThen(redeploy(new APIServer(conf, storeFacadeURU)))
-				.andThen(redeploy(new JobScheduler(storeFacadeURU)));
+	protected void setupNitriteManager() {
+		deploy(new NitriteDeployer("appNO2")).subscribe(id -> {
+			logger.info("Deployed NitriteDeployer with id: {}", id);
+		}, e -> {
+			logger.info("Deployed NitriteDeployer error", e);
+		});
+	}
+
+	protected void setupCassandraManager() {
+		deploy(new CassandraDeployer("unicorn")).subscribe(id -> {
+			logger.info("Deployed CassandraDeployer with id: {}", id);
+		}, e -> {
+			logger.info("Deployed CassandraDeployer error", e);
+		});
+	}
+
+	protected Completable configure(JsonObject conf) {
+		return awareDeploy(new StoreFacade(storeFacadeURU, getJdbcDeployer("mystore")))
+				.andThen(awareDeploy(new APIServer(conf, storeFacadeURU)));
+		// .andThen(redeploy(new JobScheduler(storeFacadeURU)))
 	}
 }

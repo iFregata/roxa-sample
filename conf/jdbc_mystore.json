@@ -1,0 +1,10 @@
+{
+  "vendor":"mysql",
+  "user":"root",
+  "pass":"pass4pass",
+  "host":"localhost",
+  "port":3306,
+  "database":"mystore",
+  "pool_size":5,
+  "leak_trace_interval":-1
+}
