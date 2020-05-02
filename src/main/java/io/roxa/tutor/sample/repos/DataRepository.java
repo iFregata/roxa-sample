@@ -10,6 +10,9 @@
  */
 package io.roxa.tutor.sample.repos;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import io.reactivex.Single;
 import io.roxa.vertx.rx.jdbc.JdbcAgent;
 import io.vertx.core.json.JsonArray;
@@ -53,6 +56,24 @@ public class DataRepository {
 	public Single<JsonObject> deleteProduct(String productId) {
 		return jdbc.update("delete from product where id=?", new JsonArray().add(productId))
 				.map(affected -> new JsonObject().put("product_id", productId));
+	}
+
+	public Single<JsonObject> insertSales(JsonObject saleMaster, List<JsonObject> itemList) {
+		List<JsonArray> batchParams = itemList.stream()
+				.map(i -> new JsonArray().add(i.getString("sale_seq")).add(i.getInteger("item_id"))
+						.add(i.getString("item_name")).add(i.getInteger("quantity")).add(i.getInteger("sale_price")))
+				.collect(Collectors.toList());
+		return jdbc.tx(conn -> {
+			return jdbc.update(conn, "insert into sale(sale_seq, customer_name, ship_address) values(?,?,?)",
+					new JsonArray().add(saleMaster.getString("sale_seq")).add(saleMaster.getString("customer_name"))
+							.add(saleMaster.getString("ship_address")))
+					.flatMap(affect -> {
+						return jdbc.batch(conn,
+								"insert into sale_item(sale_seq,item_id,item_name,quantity,sale_price) values(?,?,?,?,?)",
+								batchParams);
+					}).map(result -> new JsonObject().put("sale_seq", saleMaster.getString("sale_seq")));
+		});
+
 	}
 
 }

@@ -60,7 +60,20 @@ public class APIServer extends AbstractHttpVerticle {
 
 		router.post(pathOf("/client-register")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::clientRegister);
 		router.get(pathOf("/client-register")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::listClientRegister);
+
+		router.post(pathOf("/sales")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::bookSale);
+
 		return super.setupRouter(router);
+	}
+
+	private void bookSale(RoutingContext rc) {
+		JsonObject saleInfo = rc.getBodyAsJson();
+		EventActionEndpoint.create(vertx).urn(storeFacadeURN).action("bookSale").<JsonObject>request(saleInfo.copy())
+				.subscribe(rs -> {
+					succeeded(rc, rs);
+				}, e -> {
+					failed(rc, e);
+				});
 	}
 
 	private void clientRegister(RoutingContext rc) {

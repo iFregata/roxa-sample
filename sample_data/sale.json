@@ -1,0 +1,18 @@
+{
+  "customer_name":"Jack",
+  "ship_address":"Abc Road",
+  "sale_items":[
+  	{
+  	  "item_id":"A101",
+  	  "item_name":"iPhoneX",
+  	  "quantity":1,
+  	  "sale_price":569900
+  	},
+  	{
+  	  "item_id":"A102",
+  	  "item_name":"iPhone11",
+  	  "quantity":1,
+  	  "sale_price":869900
+  	}
+  ]
+}

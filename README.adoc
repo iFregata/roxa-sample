@@ -79,6 +79,19 @@ create table product(
   date_created bigint not null,
   date_modified bigint not null
 );
+create table sale(
+  sale_seq varchar(32) not null primary key,
+  customer_name varchar(32),
+  ship_address varchar(64)
+);
+create table sale_item(
+  sale_seq varchar(32) not null,
+  item_id int not null,
+  item_name varchar(32),
+  quantity int,
+  sale_price int,
+  constraint sale_item_pk primary key(sale_seq,item_id)
+);
 ----
 
 === Application Service

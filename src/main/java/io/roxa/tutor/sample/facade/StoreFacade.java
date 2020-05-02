@@ -10,6 +10,10 @@
  */
 package io.roxa.tutor.sample.facade;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.roxa.tutor.sample.repos.DataRepository;
 import io.roxa.vertx.rx.EventActionDispatcher;
@@ -47,6 +51,19 @@ public class StoreFacade extends EventActionDispatcher {
 	@Override
 	protected void setJdbcAgent(JdbcAgent jdbc) {
 		dataRepository = new DataRepository(jdbc);
+	}
+
+	public Single<JsonObject> bookSale(JsonObject saleInfo) {
+		String seq = String.valueOf(System.currentTimeMillis());
+		JsonArray saleItems = saleInfo.getJsonArray("sale_items");
+		JsonObject saleMaster = saleInfo.copy();
+		saleMaster.remove("sale_items");
+		saleMaster.put("sale_seq", seq);
+		List<JsonObject> itemList = Flowable.range(0, saleItems.size()).zipWith(saleItems, (i, item) -> {
+			JsonObject saleItem = (JsonObject) item;
+			return saleItem.put("item_id", i).put("sale_seq", seq);
+		}).collect(ArrayList<JsonObject>::new, (list, e) -> list.add(e)).blockingGet();
+		return dataRepository.insertSales(saleMaster, itemList);
 	}
 
 	public Single<JsonObject> createWebAPIClient(JsonObject registerInfo) {

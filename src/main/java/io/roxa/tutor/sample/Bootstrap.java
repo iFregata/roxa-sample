@@ -37,7 +37,7 @@ public class Bootstrap extends AbstractBootVerticle {
 
 	public void start() throws Exception {
 		// setupCronScheduler();
-		setupCassandraManager();
+		// setupCassandraManager();
 		setupNitriteManager();
 		setupJdbcDeployer("mystore");
 	}
