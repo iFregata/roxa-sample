@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.reactivex.Single;
+import io.roxa.http.BadRequestException;
 import io.roxa.util.Codecs;
 import io.roxa.util.Moments;
 import io.roxa.util.Randoms;
@@ -38,6 +39,7 @@ public class APIServer extends AbstractHttpVerticle {
 	public APIServer(JsonObject conf, String storeFacadeURN) {
 		super(conf);
 		this.storeFacadeURN = storeFacadeURN;
+		setFileUploadsLocation(System.getProperty("user.dir") + "/upload");
 	}
 
 	@Override
@@ -63,7 +65,19 @@ public class APIServer extends AbstractHttpVerticle {
 
 		router.post(pathOf("/sales")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::bookSale);
 
+		router.post(pathOf("/upload")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::uploadHandle);
+
 		return super.setupRouter(router);
+	}
+
+	private void uploadHandle(RoutingContext rc) {
+		JsonObject uploadFileInfo = resolveFileInfo(rc);
+		if (uploadFileInfo == null) {
+			failed(rc, new BadRequestException("No file data found!"));
+			return;
+		}
+		logger.debug("upload file info:{}", uploadFileInfo.encode());
+		succeeded(rc, uploadFileInfo);
 	}
 
 	private void bookSale(RoutingContext rc) {
