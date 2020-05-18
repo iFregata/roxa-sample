@@ -1,6 +1,10 @@
 {
-	"name": "MyStore Server",
-	"http_endpoint": "mystore-server",
 	"port": 8181,
-	"context_path": "/mystore"
+	"context_path": "/mystore",
+	"auth_policy":{
+		"mode":"bearer"
+	},
+	"token_policy":{
+		"ttl_seconds": 7200
+	}
 }

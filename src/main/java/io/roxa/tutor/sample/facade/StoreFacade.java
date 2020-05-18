@@ -75,6 +75,11 @@ public class StoreFacade extends EventActionDispatcher {
 		});
 	}
 
+	public Single<JsonObject> findWebAPIClient(JsonObject clientInfo) {
+		return nitriteAgent.selectFirst("webapi_clients",
+				new JsonObject().put("client_id", clientInfo.getString("client_id")));
+	}
+
 	public Single<JsonArray> listWebAPIClient() {
 		return nitriteAgent.select("webapi_clients");
 	}

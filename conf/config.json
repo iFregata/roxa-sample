@@ -2,8 +2,9 @@
 	"port": 8181,
 	"context_path": "/mystore",
 	"auth_policy":{
-		"mode":"bypass",
-		"client_id":"0c79597821403cc000c6248e56d03581",
-		"client_key":"mpOHZjeVkSUmDeyc"
+		"mode":"bearer"
+	},
+	"token_policy":{
+		"ttl_seconds": 7200
 	}
 }
