@@ -78,7 +78,7 @@ public class APIServer extends AbstractHttpVerticle {
 
 		router.get(pathOf("/authz/sign-sample")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::clientSignSample);
 
-		router.get(pathOf("/authz/token")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::getToken);
+		router.get(pathOf("/authz/token")).produces(MEDIA_TYPE_APPLICATION_JSON).handler(this::issueToken);
 
 		router.get(pathOf("/authz/token-protected")).produces(MEDIA_TYPE_APPLICATION_JSON)
 				.handler(this::getTokenProtectedResource);
@@ -97,7 +97,6 @@ public class APIServer extends AbstractHttpVerticle {
 	}
 
 	protected Single<JsonObject> getClientRegister(String clientId) {
-		logger.debug("client id: {}", clientId);
 		return EventActionEndpoint.create(vertx).urn(storeFacadeURN).action("findWebAPIClient")
 				.<JsonObject>request(new JsonObject().put("client_id", clientId));
 	}
@@ -136,7 +135,7 @@ public class APIServer extends AbstractHttpVerticle {
 		});
 	}
 
-	private void getToken(RoutingContext rc) {
+	private void issueToken(RoutingContext rc) {
 		issueClientToken(rc, getServerConfiguration().getJsonObject("token_policy")).subscribe(rs -> {
 			succeeded(rc, rs);
 		}, e -> {
