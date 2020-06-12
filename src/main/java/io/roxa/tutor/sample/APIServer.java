@@ -125,6 +125,7 @@ public class APIServer extends AbstractHttpVerticle {
 	}
 
 	private void getSignProtectedResource(RoutingContext rc) {
+
 		authorize(rc, getServerConfiguration().getJsonObject("auth_policy")).map(clientRegister -> {
 			logger.info("Client register: {}", clientRegister.encode());
 			return new JsonObject().put("content", "Sign protected resource");
